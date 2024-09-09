@@ -44,21 +44,6 @@ pub(crate) unsafe fn managed_string(
     s
 }
 
-#[allow(dead_code)]
-pub fn clip_by_rect<G: Geom>(
-    g: &G,
-    xmin: f64,
-    ymin: f64,
-    xmax: f64,
-    ymax: f64,
-) -> GResult<Geometry> {
-    unsafe {
-        let context = g.clone_context();
-        let ptr = GEOSClipByRect_r(context.as_raw(), g.as_raw(), xmin, ymin, xmax, ymax);
-        Geometry::new_from_raw(ptr, context, "clip_by_rect")
-    }
-}
-
 pub fn version() -> GResult<String> {
     unsafe { unmanaged_string(GEOSversion(), "version") }
 }
@@ -78,8 +63,16 @@ pub(crate) fn check_ret(val: i32, p: PredicateType) -> GResult<()> {
     }
 }
 
-pub(crate) fn check_same_geometry_type(geoms: &[Geometry], geom_type: GeometryTypes) -> bool {
-    geoms.iter().all(|g| g.geometry_type() == geom_type)
+pub(crate) fn check_same_geometry_type(
+    geoms: &[Geometry],
+    geom_type: GeometryTypes,
+) -> GResult<bool> {
+    for geom in geoms {
+        if geom.geometry_type()? != geom_type {
+            return Ok(false);
+        }
+    }
+    return Ok(true);
 }
 
 pub(crate) fn create_multi_geom(
@@ -127,7 +120,7 @@ pub fn orientation_index(
 ) -> GResult<Orientation> {
     match ContextHandle::init() {
         Ok(context) => unsafe {
-            match Orientation::try_from(GEOSOrientationIndex_r(
+            Orientation::try_from(GEOSOrientationIndex_r(
                 context.as_raw(),
                 ax,
                 ay,
@@ -135,10 +128,7 @@ pub fn orientation_index(
                 by,
                 px,
                 py,
-            )) {
-                Ok(o) => Ok(o),
-                Err(e) => Err(Error::GenericError(e.to_owned())),
-            }
+            ))
         },
         Err(e) => Err(e),
     }
