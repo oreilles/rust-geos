@@ -187,6 +187,21 @@ impl Into<c_int> for GeometryTypes {
     }
 }
 
+impl GeometryTypes {
+    pub fn is_collection(&self) -> bool {
+        matches!(
+            &self,
+            GeometryTypes::MultiPoint
+                | GeometryTypes::MultiLineString
+                | GeometryTypes::MultiPolygon
+                | GeometryTypes::GeometryCollection
+                | GeometryTypes::CompoundCurve
+                | GeometryTypes::MultiCurve
+                | GeometryTypes::MultiSurface
+        )
+    }
+}
+
 #[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 pub enum Orientation {
     /// If reaching P takes a counter-clockwise (left) turn.
