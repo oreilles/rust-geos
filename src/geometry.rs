@@ -1531,7 +1531,7 @@ impl$(<$lt>)? Geom for $ty_name$(<$lt>)? {
     fn get_coord_seq(&self) -> GResult<CoordSeq> {
         let type_geom = self.geometry_type()?;
         match type_geom {
-            GeometryTypes::Point | GeometryTypes::LineString | GeometryTypes::LinearRing => unsafe {
+            GeometryTypes::Point | GeometryTypes::LineString | GeometryTypes::LinearRing | GeometryTypes::CircularString => unsafe {
                 let coord = GEOSGeom_getCoordSeq_r(self.get_raw_context(), self.as_raw());
                 let t = GEOSCoordSeq_clone_r(self.get_raw_context(), coord);
                 let mut size = 0;
@@ -1546,7 +1546,7 @@ impl$(<$lt>)? Geom for $ty_name$(<$lt>)? {
                 CoordSeq::new_from_raw(t, self.clone_context(), size, dims, "get_coord_seq")
             },
             _ => Err(Error::ImpossibleOperation(
-                "Geometry must be a Point, LineString or LinearRing to extract its coordinates"
+                "Geometry must be a Point, LineString, LinearRing or CircularString to extract its coordinates"
                     .into(),
             )),
         }
