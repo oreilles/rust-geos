@@ -1478,6 +1478,8 @@ pub trait Geom:
     fn remove_repeated_points(&self, tolerance: f64) -> GResult<Geometry>;
     #[cfg(any(feature = "v3_11_0", feature = "dox"))]
     fn transform_xy<V: FnMut(&mut f64, &mut f64) -> i32>(&self, transform: V) -> GResult<Geometry>;
+    #[cfg(any(feature = "v3_14_0", feature = "dox"))]
+    fn transform_xyz<V: FnMut(&mut f64, &mut f64, &mut f64) -> i32>(&self, transform: V) -> GResult<Geometry>;
     #[cfg(any(feature = "v3_11_0", feature = "dox"))]
     fn concave_hull(&self, ratio: f64, allow_holes: bool) -> GResult<Geometry>;
     #[cfg(any(feature = "v3_11_0", feature = "dox"))]
@@ -2548,6 +2550,23 @@ impl$(<$lt>)? Geom for $ty_name$(<$lt>)? {
         }
     }
 
+    #[cfg(any(feature = "v3_14_0", feature = "dox"))]
+    fn transform_xyz<V: FnMut(&mut f64, &mut f64, &mut f64) -> i32>(
+        &self,
+        transform: V,
+    ) -> GResult<Geometry> {
+        unsafe {
+            let (closure, callback) = unpack_tranform_xyz_closure(&transform);
+            let ptr = GEOSGeom_transformXYZ_r(
+                self.get_raw_context(),
+                self.as_raw(),
+                Some(callback),
+                closure,
+            );
+            Geometry::new_from_raw(ptr, self.clone_context(), "transform_xyz")
+        }
+    }
+
     #[cfg(any(feature = "v3_11_0", feature = "dox"))]
     fn concave_hull(&self, ratio: f64, allow_holes: bool) -> GResult<Geometry> {
         unsafe {
@@ -3449,6 +3468,29 @@ where
         unsafe {
             let closure: &mut F = &mut *(data as *mut F);
             (*closure)(&mut *(x as *mut f64), &mut *(y as *mut f64))
+        }
+    }
+
+    (closure as *const F as *mut c_void, trampoline::<F>)
+}
+
+#[cfg(any(feature = "v3_14_0", feature = "dox"))]
+unsafe fn unpack_tranform_xyz_closure<F>(
+    closure: &F,
+) -> (
+    *mut c_void,
+    extern "C" fn(*mut f64, *mut f64, *mut f64, *mut c_void) -> i32,
+)
+where
+    F: FnMut(&mut f64, &mut f64, &mut f64) -> i32,
+{
+    extern "C" fn trampoline<F>(x: *mut f64, y: *mut f64, z: *mut f64, data: *mut c_void) -> i32
+    where
+        F: FnMut(&mut f64, &mut f64, &mut f64) -> i32,
+    {
+        unsafe {
+            let closure: &mut F = &mut *(data as *mut F);
+            (*closure)(&mut *(x as *mut f64), &mut *(y as *mut f64), &mut *(z as *mut f64))
         }
     }
 
