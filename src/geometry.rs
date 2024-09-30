@@ -1448,7 +1448,7 @@ pub trait Geom:
     ///                         1.0000000000000000 5.0000000000000000, \
     ///                         1.0000000000000000 1.0000000000000000)");
     /// ```
-    fn get_interior_ring_n(&self, n: u32) -> GResult<ConstGeometry>;
+    fn get_interior_ring_n(&self, n: usize) -> GResult<ConstGeometry>;
     /// Returns the exterior ring.
     ///
     /// # Example
@@ -2493,7 +2493,7 @@ impl$(<$lt>)? Geom for $ty_name$(<$lt>)? {
         }
     }
 
-    fn get_interior_ring_n(&self, n: u32) -> GResult<ConstGeometry> {
+    fn get_interior_ring_n(&self, n: usize) -> GResult<ConstGeometry> {
         if !matches!(self.geometry_type()?, GeometryTypes::Polygon | GeometryTypes::CurvePolygon) {
             return Err(Error::GenericError("Geometry must be a Polygon or CurvePolygon".to_owned()));
         }
