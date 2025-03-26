@@ -3052,6 +3052,63 @@ impl Geometry {
         }
     }
 
+    /// Creates an empty circular string geometry.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geos::{Geom, Geometry};
+    ///
+    /// let geom = Geometry::create_empty_circular_string().expect("Failed to build empty circular string");
+    ///
+    /// assert_eq!(geom.to_wkt().unwrap(), "CIRCULARSTRING EMPTY");
+    /// ```
+    #[cfg(any(feature = "v3_13_0", feature = "dox"))]
+    pub fn create_empty_circular_string() -> GResult<Geometry> {
+        with_context(|ctx| unsafe {
+            let ptr = GEOSGeom_createEmptyCircularString_r(ctx.as_raw());
+            Geometry::new_from_raw(ptr, ctx, "create_empty_circular_string")
+        })
+    }
+
+    /// Creates an empty compound curve geometry.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geos::{Geom, Geometry};
+    ///
+    /// let geom = Geometry::create_empty_compound_curve().expect("Failed to build empty compound curve");
+    ///
+    /// assert_eq!(geom.to_wkt().unwrap(), "COMPOUNDCURVE EMPTY");
+    /// ```
+    #[cfg(any(feature = "v3_13_0", feature = "dox"))]
+    pub fn create_empty_compound_curve() -> GResult<Geometry> {
+        with_context(|ctx| unsafe {
+            let ptr = GEOSGeom_createEmptyCompoundCurve_r(ctx.as_raw());
+            Geometry::new_from_raw(ptr, ctx, "create_empty_compound_curve")
+        })
+    }
+
+    /// Creates an empty curve polygon geometry.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geos::{Geom, Geometry};
+    ///
+    /// let geom = Geometry::create_empty_curve_polygon().expect("Failed to build empty curve polygon");
+    ///
+    /// assert_eq!(geom.to_wkt().unwrap(), "CURVEPOLYGON EMPTY");
+    /// ```
+    #[cfg(any(feature = "v3_13_0", feature = "dox"))]
+    pub fn create_empty_curve_polygon() -> GResult<Geometry> {
+        with_context(|ctx| unsafe {
+            let ptr = GEOSGeom_createEmptyCompoundCurve_r(ctx.as_raw());
+            Geometry::new_from_raw(ptr, ctx, "create_empty_curve_polygon")
+        })
+    }
+
     /// Creates an empty collection.
     ///
     /// The `type_` must be one of:
@@ -3060,6 +3117,8 @@ impl Geometry {
     /// * [`GeometryTypes::MultiPoint`]
     /// * [`GeometryTypes::MultiLineString`]
     /// * [`GeometryTypes::MultiPolygon`]
+    /// * [`GeometryTypes::MultiCurve`]
+    /// * [`GeometryTypes::MultiSurface`]
     ///
     /// # Example
     ///
@@ -3076,7 +3135,9 @@ impl Geometry {
             GeometryTypes::GeometryCollection
             | GeometryTypes::MultiPoint
             | GeometryTypes::MultiLineString
-            | GeometryTypes::MultiPolygon => {}
+            | GeometryTypes::MultiPolygon
+            | GeometryTypes::MultiCurve
+            | GeometryTypes::MultiSurface => {}
             _ => return Err(Error::GenericError("Invalid geometry type".to_owned())),
         }
         match ContextHandle::init_e(Some("Geometry::create_empty_collection")) {
