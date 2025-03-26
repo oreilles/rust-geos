@@ -3065,10 +3065,13 @@ impl Geometry {
     /// ```
     #[cfg(any(feature = "v3_13_0", feature = "dox"))]
     pub fn create_empty_circular_string() -> GResult<Geometry> {
-        with_context(|ctx| unsafe {
-            let ptr = GEOSGeom_createEmptyCircularString_r(ctx.as_raw());
-            Geometry::new_from_raw(ptr, ctx, "create_empty_circular_string")
-        })
+        match ContextHandle::init_e(Some("Geometry::create_empty_circular_string")) {
+            Ok(context) => unsafe {
+                let ptr = GEOSGeom_createEmptyCircularString_r(context.as_raw());
+                Geometry::new_from_raw(ptr, Arc::new(context), "create_empty_circular_string")
+            },
+            Err(e) => Err(e),
+        }
     }
 
     /// Creates an empty compound curve geometry.
@@ -3084,10 +3087,13 @@ impl Geometry {
     /// ```
     #[cfg(any(feature = "v3_13_0", feature = "dox"))]
     pub fn create_empty_compound_curve() -> GResult<Geometry> {
-        with_context(|ctx| unsafe {
-            let ptr = GEOSGeom_createEmptyCompoundCurve_r(ctx.as_raw());
-            Geometry::new_from_raw(ptr, ctx, "create_empty_compound_curve")
-        })
+        match ContextHandle::init_e(Some("Geometry::create_empty_compound_curve")) {
+            Ok(context) => unsafe {
+                let ptr = GEOSGeom_createEmptyCompoundCurve_r(context.as_raw());
+                Geometry::new_from_raw(ptr, Arc::new(context), "create_empty_compound_curve")
+            },
+            Err(e) => Err(e),
+        }
     }
 
     /// Creates an empty curve polygon geometry.
@@ -3103,10 +3109,13 @@ impl Geometry {
     /// ```
     #[cfg(any(feature = "v3_13_0", feature = "dox"))]
     pub fn create_empty_curve_polygon() -> GResult<Geometry> {
-        with_context(|ctx| unsafe {
-            let ptr = GEOSGeom_createEmptyCompoundCurve_r(ctx.as_raw());
-            Geometry::new_from_raw(ptr, ctx, "create_empty_curve_polygon")
-        })
+        match ContextHandle::init_e(Some("Geometry::create_empty_curve_polygon")) {
+            Ok(context) => unsafe {
+                let ptr = GEOSGeom_createEmptyCurvePolygon_r(context.as_raw());
+                Geometry::new_from_raw(ptr, Arc::new(context), "create_empty_curve_polygon")
+            },
+            Err(e) => Err(e),
+        }
     }
 
     /// Creates an empty collection.
